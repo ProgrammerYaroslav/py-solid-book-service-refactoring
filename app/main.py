@@ -1,16 +1,31 @@
 # app/main.py
-import xml.etree.ElementTree as ET  # Виправлено N817: використовуємо стандартний аліас ET
 from typing import Any
-from services.book_actions import BookService
-from services.notifications import EmailNotification
-from repositories.book_repo import BookRepository
+from app.models import Book
+from app.display import ConsoleDisplay, ReverseDisplay
+from app.printer import ConsolePrinter, ReversePrinter
+from app.serializers import JsonSerializer, XmlSerializer
 
-class App:
-    def __init__(self) -> None:  # Виправлено ANN204: додано аннотацію -> None
-        self.repo = BookRepository()
-        self.notifier = EmailNotification()
-        self.service = BookService(self.repo, self.notifier)
+def main(book: Book, commands: list[tuple[str, str]]) -> Any:
+    displays = {
+        "console": ConsoleDisplay(),
+        "reverse": ReverseDisplay(),
+    }
+    printers = {
+        "console": ConsolePrinter(),
+        "reverse": ReversePrinter(),
+    }
+    serializers = {
+        "json": JsonSerializer(),
+        "xml": XmlSerializer(),
+    }
 
-    def run(self, data: dict[str, Any]) -> Any:
-        # Логіка має залишатися ідентичною оригінальній
-        return self.service.create_book(data)
+    result = None
+    for action, method in commands:
+        if action == "display":
+            displays[method].display(book)
+        elif action == "print":
+            printers[method].print_book(book)
+        elif action == "serialize":
+            result = serializers[method].serialize(book)
+            
+    return result
