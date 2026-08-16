@@ -1,9 +1,10 @@
-# app/main.py
 from typing import Any
-from app.models import Book
+
 from app.display import ConsoleDisplay, ReverseDisplay
+from app.models import Book
 from app.printer import ConsolePrinter, ReversePrinter
 from app.serializers import JsonSerializer, XmlSerializer
+
 
 def main(book: Book, commands: list[tuple[str, str]]) -> Any:
     displays = {
@@ -27,5 +28,5 @@ def main(book: Book, commands: list[tuple[str, str]]) -> Any:
             printers[method].print_book(book)
         elif action == "serialize":
             result = serializers[method].serialize(book)
-            
+
     return result
